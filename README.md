@@ -1,6 +1,6 @@
 
 
-> :warning: ***This is work in progress with some additional updates to handle some known nuances coming  soon.***
+> :warning: ***This is work in progress with some additional updates to handle known nuances coming  soon.***
 
 ## Vault on Openshift using Helm
 -------------
