@@ -38,13 +38,13 @@ If not, it will install  minishift on you system using homebrew.
        . It will then using parameters in vaules.yaml spin up a vault enterprise cluster using Helm.
                 - In the end you will see 3 vault pods named `vault-<n>`
                 - And Vault agent injector pod
-       . Display output of Vault status from vault-0 pod
+       . Initialize and unseal vault cluster
 ```
 
 :eyes: **Please Note**: There are couple of changes are done here on Hashicorp Vault official Vault-Helm chart to make it work in local
 
 ```
-        1. As minishift like minicube is lightweight single node instance, we have to comment out the affinity lsrules from vaules.yaml. So that all 4 pods are created under same node.
+        1. As minishift like minikube is lightweight single node instance, we have to comment out the affinity rules from vaules.yaml. So that all 4 pods are created under same node.
         2. Commented out caBundle from injector-mutating-webhook.yaml to suppress the error.
         3. Values.yaml is set to fetch Vault Enterprise latest image from Docker hub. If you want use OSS or other version please update the repository information and version on agentImage and server accordingly.
 ```
