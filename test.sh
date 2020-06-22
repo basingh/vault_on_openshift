@@ -65,7 +65,7 @@ helm install vault -f values.yaml ./ \
 #    --set "server.dev.enabled=true"
 
 ## setup vault now
-wait 5s
+sleep 10s
 # first check pod status, output of this command should be `running`
 oc describe pods vault-0 | grep ^Status: | head -1 | awk '{print $2}' | tr -d '\n'
 
