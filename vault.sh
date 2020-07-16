@@ -66,6 +66,9 @@ helm install vault -f values.yaml ./ \
 
 ## setup vault now
 eval $(minishift oc-env)
+## or consider this
+## export PATH="/Users/baljeetsingh/.minishift/cache/oc/v3.11.0/darwin:$PATH"
+
 sleep 60
 # first check pod status, output of this command should be `running`
 oc describe pods vault-0 | grep ^Status: | head -1 | awk '{print $2}' | tr -d '\n'
