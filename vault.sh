@@ -36,7 +36,7 @@ oc new-project vault \
 
 ## confirm the project context is set to vault 
 
-oc project
+oc project vault
 
 ## next up install vault HA cluster using helm
 ## add Hashicorp to your  Helm
@@ -94,10 +94,19 @@ echo "########################## Unsealing vault ##########################"
 oc exec -ti vault-0 -- vault operator unseal "$UNSEAL_KEY"
 
 sleep 10
+
 # join 2 nodes to unseal vault
 echo "########################## Joining vault nodes ##########################"
-oc exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
+#oc rsh vault-1
+#export CA_CERT=`cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt`
+oc exec -ti vault-1 -- vault operator raft join https://vault-0.vault-internal:8200
+exit
+
+#oc rsh vault-2
+
+#export CA_CERT=`cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt`
 oc exec -ti vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
+exit
 
 # unseal rest of 2 nodes
 echo "########################## Unseal standby nodes ##########################"

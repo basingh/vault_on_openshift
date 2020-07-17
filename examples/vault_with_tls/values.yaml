@@ -9,7 +9,7 @@ global:
   # imagePullSecrets:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
-  tlsDisable: true
+  tlsDisable: false
   # Beta Feature: If deploying to OpenShift
   openshift: true
 
@@ -209,7 +209,9 @@ server:
 
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
-  extraEnvironmentVars: {}
+  extraEnvironmentVars: 
+    VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
+    CA_CERT : cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     # GOOGLE_REGION: global
     # GOOGLE_PROJECT: myproject
     # GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
@@ -224,9 +226,9 @@ server:
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
-  extraVolumes: []
-    # - type: secret (or "configMap")
-    #   name: my-secret
+  extraVolumes: 
+     - type: secret #(or "configMap")
+       name: vault-server-tls
     #   path: null # default is `/vault/userconfig`
 
   # Affinity Settings
@@ -396,9 +398,12 @@ server:
         ui = true
 
         listener "tcp" {
-          tls_disable = 1
+          #tls_disable = 1
           address = "[::]:8200"
           cluster_address = "[::]:8201"
+          tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+          tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
+          tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
         }
 
         storage "raft" {
