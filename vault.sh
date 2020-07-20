@@ -98,7 +98,8 @@ sleep 10
 # join 2 nodes to unseal vault
 echo "########################## Joining vault nodes ##########################"
 #oc rsh vault-1
-#export CA_CERT=`cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt`
+OS_TEST = $(oc exec -ti vault-1 -- cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
+
 oc exec -ti vault-1 -- vault operator raft join https://vault-0.vault-internal:8200
 exit
 

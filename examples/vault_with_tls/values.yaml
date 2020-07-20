@@ -203,6 +203,8 @@ server:
   # This can be used to automate processes such as initialization
   # or boostrapping auth methods.
   postStart: []
+    #command: ["/bin/sh", "-ec", "export CA_CERT=`cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt`" ]
+
   # - /bin/sh
   # - -c
   # - /vault/userconfig/myscript/run.sh
@@ -211,7 +213,8 @@ server:
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: 
     VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
-    CA_CERT : cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    CA_CERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    #CA_CERT : /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     # GOOGLE_REGION: global
     # GOOGLE_PROJECT: myproject
     # GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json

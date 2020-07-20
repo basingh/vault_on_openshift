@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#minishift openshift config set --target=kube --patch '{
+#		"kubernetesMasterConfig": {
+#		    "controllerArguments": {
+#		        "cluster-signing-cert-file": ["/etc/origin/master/ca.crt"],
+#		        "cluster-signing-key-file": ["/etc/origin/master/ca.key"]
+#			  }
+#		}
+#}'
 # SERVICE is the name of the Vault service in Kubernetes.
 # It does not have to match the actual running service, though it may help for consistency.
 echo "########################## setting service param ##########################"
@@ -56,6 +64,7 @@ DNS.1 = ${SERVICE}
 DNS.2 = ${SERVICE}.${NAMESPACE}
 DNS.3 = ${SERVICE}.${NAMESPACE}.svc
 DNS.4 = ${SERVICE}.${NAMESPACE}.svc.cluster.local
+DNS.5 = vault-0.vault-internal
 IP.1 = 127.0.0.1
 EOF
 
@@ -87,6 +96,7 @@ spec:
   - key encipherment
   - server auth
 EOF
+
 
 # send the CSR to openshift
 echo "########################## send CSR to OS ##########################"
