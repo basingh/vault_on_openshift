@@ -97,6 +97,7 @@ spec:
   - server auth
 EOF
 
+
 # send the CSR to openshift
 echo "########################## send CSR to OS ##########################"
 
