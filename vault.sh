@@ -75,13 +75,39 @@ oc describe pods vault-0 | grep ^Status: | head -1 | awk '{print $2}' | tr -d '\
 
 oc exec -ti vault-0 -- vault status
 
-# initialize vault, this will keep unseal key and root token in file called keys.txt
-echo "########################## Initializing vault ##########################"
+## for auto-unseal 
+echo "Is this implementation is with auto-unseal? (y/n)  : "
+
+read autounseal
+
+echo $autounseal
+
+if [ "$autounseal" = "y" ] ; then
+INIT_RESPONSE=$(oc exec -ti vault-0 -- vault operator init -format=json -recovery-shares=1 -recovery-threshold=1)
+echo "vaulue of inital response": $INIT_RESPONSE
+
+UNSEAL_KEY=$(echo "$INIT_RESPONSE" | jq -r .unseal_keys_b64[0])
+echo "vaulue of unseal key": $UNSEAL_KEY
+
+else
 INIT_RESPONSE=$(oc exec -ti vault-0 -- vault operator init -format=json -key-shares=1 -key-threshold=1)
 echo "vaulue of inital response": $INIT_RESPONSE
 
 UNSEAL_KEY=$(echo "$INIT_RESPONSE" | jq -r .unseal_keys_b64[0])
 echo "vaulue of unseal key": $UNSEAL_KEY
+
+echo "########################## Unsealing vault ##########################"
+oc exec -ti vault-0 -- vault operator unseal "$UNSEAL_KEY"
+
+fi
+## for auto-unseal
+# initialize vault, this will keep unseal key and root token in file called keys.txt
+#echo "########################## Initializing vault ##########################"
+#INIT_RESPONSE=$(oc exec -ti vault-0 -- vault operator init -format=json -key-shares=1 -key-threshold=1)
+#echo "vaulue of inital response": $INIT_RESPONSE
+
+#UNSEAL_KEY=$(echo "$INIT_RESPONSE" | jq -r .unseal_keys_b64[0])
+#echo "vaulue of unseal key": $UNSEAL_KEY
 
 VAULT_TOKEN=$(echo "$INIT_RESPONSE" | jq -r .root_token)
 echo "vaulue of root token key": $VAULT_TOKEN
@@ -90,24 +116,16 @@ echo "$UNSEAL_KEY" > unseal_key-vault_1
 echo "$VAULT_TOKEN" > root_token-vault_1
 # unseal vault 
 
-echo "########################## Unsealing vault ##########################"
-oc exec -ti vault-0 -- vault operator unseal "$UNSEAL_KEY"
-
 sleep 10
 
 # join 2 nodes to unseal vault
 echo "########################## Joining vault nodes ##########################"
-#oc rsh vault-1
-OS_TEST = $(oc exec -ti vault-1 -- cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
-
-oc exec -ti vault-1 -- vault operator raft join https://vault-0.vault-internal:8200
-exit
+oc exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
 
 #oc rsh vault-2
 
 #export CA_CERT=`cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt`
 oc exec -ti vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
-exit
 
 # unseal rest of 2 nodes
 echo "########################## Unseal standby nodes ##########################"
